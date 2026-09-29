@@ -13,6 +13,9 @@
     overflow: hidden;
     background: #1a1a1a;
     font-family: Arial, Helvetica, sans-serif;
+    touch-action: none;
+    overscroll-behavior: none;
+    -webkit-text-size-adjust: 100%;
   }
   #canvas-container {
     width: 100%;
@@ -28,12 +31,13 @@
   }
   #settings-panel {
     position: absolute;
-    top: 12px;
-    left: 12px;
+    top: calc(12px + env(safe-area-inset-top, 0px));
+    left: calc(12px + env(safe-area-inset-left, 0px));
     display: flex;
     flex-direction: row;
     gap: 10px;
     background: rgba(0,0,0,0.5);
+    -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
     border-radius: 14px;
     padding: 10px 12px;
@@ -105,8 +109,8 @@
   }
   #mobile-controls {
     position: absolute;
-    bottom: 16px;
-    right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    right: calc(16px + env(safe-area-inset-right, 0px));
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -121,6 +125,7 @@
     color: #fff;
     font-size: 22px;
     font-weight: bold;
+    -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
     -webkit-tap-highlight-color: transparent;
     touch-action: manipulation;
@@ -154,8 +159,8 @@
   }
   #info {
     position: absolute;
-    bottom: 12px;
-    left: 12px;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    left: calc(12px + env(safe-area-inset-left, 0px));
     color: rgba(255,255,255,0.7);
     font-size: 12px;
     background: rgba(0,0,0,0.4);
@@ -217,20 +222,11 @@
   </div>
 </div>
 
-<script type="importmap">
-{
-  "imports": {
-    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
-  }
-}
-</script>
+<script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="https://unpkg.com/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
-<script type="module">
-import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-
+<script>
 // ---- Ganti nama file di bawah ini jika nama model kamu berbeda ----
 const MODEL_PATH = 'kamar_pas_lt_2_ver_4.glb';
 // ---------------------------------------------------------------
@@ -262,7 +258,7 @@ camera.position.set(5, 5, 5);
 // Renderer
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(container.clientWidth, container.clientHeight);
-renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.outputEncoding = THREE.sRGBEncoding;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.0;
 container.appendChild(renderer.domElement);
@@ -284,7 +280,7 @@ const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
 scene.add(hemiLight);
 
 // Controls - rotate, zoom, pan
-const controls = new OrbitControls(camera, renderer.domElement);
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.dampingFactor = 0.08;
 controls.enableZoom = true;
@@ -379,7 +375,7 @@ document.getElementById('reset-view').addEventListener('click', () => {
 });
 
 // Load model
-const loader = new GLTFLoader();
+const loader = new THREE.GLTFLoader();
 
 loader.load(
   MODEL_PATH,
